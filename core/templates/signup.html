@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - JobEntry</title>
+    <!-- Link Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .register-container {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f8f9fa;
+        }
+
+        .register-form-container {
+            width: 80%;
+            max-width: 900px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .toggle-btns {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .toggle-btn {
+            width: 120px;
+            padding: 10px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .toggle-btn.active {
+            background-color: #2683ee;
+            color: white;
+        }
+
+        .register-form {
+            display: none;
+        }
+
+        .register-form.active {
+            display: block;
+        }
+
+        .form-label {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container-fluid register-container">
+        <div class="register-form-container">
+
+            <!-- Toggle Buttons -->
+            <div class="toggle-btns">
+                <button class="toggle-btn active" id="jobSeekerBtn">Job Seeker</button>
+                <button class="toggle-btn" id="employerBtn">Employer</button>
+            </div>
+
+            <!-- Job Seeker Registration Form -->
+            <div class="register-form job-seeker-form active">
+                <h2 class="text-center mb-4">Job Seeker Registration</h2>
+                <form id="jobSeekerForm" method="post" action="{% url 'signup' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_type" value="seeker"> <!-- Hidden field -->
+                    <div class="mb-3">
+                        <label for="fullname" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Enter your name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password1" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password1" name="password1" placeholder="Enter your password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password2" class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control" id="password2" name="password2" placeholder="Confirm your password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Register</button>
+                </form>
+            </div>
+
+            <!-- Employer Registration Form -->
+            <div class="register-form employer-form">
+                <h2 class="text-center mb-4">Employer Registration</h2>
+                <form id="employerForm" method="post" action="{% url 'signup' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_type" value="employer"> <!-- Hidden field -->
+                    <div class="mb-3">
+                        <label for="company_name" class="form-label">Company Name</label>
+                        <input type="text" class="form-control" id="company_name" name="company_name" placeholder="Enter your company name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password1" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password1" name="password1" placeholder="Enter your password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password2" class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control" id="password2" name="password2" placeholder="Confirm your password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Register</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+<script> 
+    document.addEventListener('DOMContentLoaded', function () {
+    const jobSeekerBtn = document.getElementById('jobSeekerBtn');
+    const employerBtn = document.getElementById('employerBtn');
+    const jobSeekerForm = document.querySelector('.job-seeker-form');
+    const employerForm = document.querySelector('.employer-form');
+
+    // Toggle functionality
+    jobSeekerBtn.addEventListener('click', () => {
+        jobSeekerForm.classList.add('active');
+        employerForm.classList.remove('active');
+        jobSeekerBtn.classList.add('active');
+        employerBtn.classList.remove('active');
+    });
+
+    employerBtn.addEventListener('click', () => {
+        employerForm.classList.add('active');
+        jobSeekerForm.classList.remove('active');
+        employerBtn.classList.add('active');
+        jobSeekerBtn.classList.remove('active');
+    });
+});
+
+</script>
+   

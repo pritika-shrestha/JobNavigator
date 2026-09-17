@@ -1,0 +1,89 @@
+{% extends 'jobseeker_base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Job Seeker Notifications</h2>
+
+    {% if welcome_message %}
+        <div id="welcome-message" class="alert alert-info alert-dismissible fade show" role="alert">
+            {{ welcome_message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endif %}
+
+    {% if notifications %}
+    <div class="notification-container">
+        <div class="list-group">
+            {% for notification in notifications %}
+                <div class="list-group-item d-flex justify-content-between align-items-center notification-block {% if not notification.is_read %}bg-light{% endif %}"
+                     data-url="{{ notification.url|default:'#' }}" style="width: 100%; padding: 20px; cursor: pointer;">
+                    
+                    <div class="w-100">
+                        <a href="{% url 'notification_detail' notification.id %}" class="list-group-item list-group-item-action text-decoration-none d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="mb-1">{{ notification.message|safe }}</p>
+                                <small class="text-muted">{{ notification.created_at }}</small>
+                            </div>
+                            <button type="button" class="btn btn-outline-danger btn-sm dismiss-btn" data-id="{{ notification.id }}" onclick="event.stopPropagation();">Dismiss</button>
+                        </a>
+                    </div>
+
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+        <p class="text-muted">No notifications found.</p>
+    {% endif %}
+</div>
+
+<script>
+        document.addEventListener("DOMContentLoaded", function() {
+        let welcomePopup = document.getElementById("welcome-message");
+
+        // Show the welcome message only if it hasn't been shown in this session
+        if (welcomePopup && !sessionStorage.getItem("welcomeDisplayed")) {
+            setTimeout(() => { 
+                welcomePopup.style.display = "none"; 
+                sessionStorage.setItem("welcomeDisplayed", "true"); 
+            }, 5000);
+        } else {
+            // Hide it immediately if it's already been shown
+            welcomePopup.style.display = "none";
+        }
+
+        document.querySelectorAll('.dismiss-btn').forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.stopPropagation();
+                const notificationId = this.dataset.id;
+                
+                fetch(`/notifications/dismiss/${notificationId}/`, {
+                    method: 'POST',
+                    headers: { 
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        this.closest('.notification-block').remove();
+                    } else {
+                        alert("Failed to dismiss notification.");
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            });
+        });
+
+        document.querySelectorAll('.notification-block').forEach(block => {
+            block.addEventListener('click', function() {
+                const url = this.dataset.url;
+                if (url && url !== '#') {
+                    window.location.href = url;
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

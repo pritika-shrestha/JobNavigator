@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #333;
+            color: white;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            padding: 15px 20px;
+            text-decoration: none;
+            color: white;
+            display: block;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #575757;
+        }
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+            align-items: center;
+            background-color: #f4f4f4;
+            padding: 10px 20px;
+            border-bottom: 1px solid #ddd;
+            position: fixed;
+            width: calc(100% - 250px);
+            top: 0;
+            left: 250px;
+        }
+
+        .top-bar button {
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .top-bar button:hover {
+            background-color: #575757;
+        }
+
+        .content-body {
+            margin-top: 60px;
+        }
+
+        .stats-card {
+            background: #96999d;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .applications-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .application-list {
+            margin-top: 20px;
+        }
+
+        .application-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h3 class="text-center text-white">Company Profile</h3>
+        <a href="{% url 'employer_dashboard' %}">Dashboard</a>
+        <a href="{% url 'notifications' %}">Notifications</a>
+        <a href="{% url 'company_manage_jobs' %}">Manage Jobs</a>
+        <a href="{% url 'company_post_job' %}">Post Job</a>
+        <a href="{% url 'company_profile'%}">Profile</a>
+    </div>
+
+    <div class="top-bar">
+        <button onclick="handleLogout()">Logout</button>
+    </div>
+
+    <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
+
+    <div class="content">
+        <div class="content-body">
+            <h2>Dashboard</h2>
+            <p>Welcome, {{ request.user.username }} to your company dashboard. Here you can view an overview of your company's activities.</p>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="stats-card">
+                        <h5><strong>Total Job Posts</strong></h5>
+                        <p>{{ total_jobs }}</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stats-card">
+                        <h5><strong>New Applications</strong></h5>
+                        <p>{{ total_applications }}</p>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="applications-card">
+                <h3><strong>Job Applications</strong></h3>
+                {% for data in job_posts_data %}
+                <div class="application-list">
+                    <h5><strong>Job Title:</strong> {{ data.job.JobTitle }}</h5>  <!--  Show job title -->
+                    {% if data.applications %}
+                    
+                        {% for application in data.applications %}
+                            <div class="application-item">
+                                <span><strong>Applicant:</strong> {{ application.job_seeker.full_name }} - <strong>Status:</strong> {{ application.status }}</span>
+                                <div>
+                                    <a href="{% url 'employer_jobseeker_profile' application.job_seeker.id %}" class="btn btn-info btn-sm">View Profile</a>
+                                    <button class="btn btn-success btn-sm" onclick="updateApplicationStatus('{{ application.id }}', 'Accepted')">Accept</button>
+                                    <button class="btn btn-danger btn-sm" onclick="updateApplicationStatus('{{ application.id }}', 'Rejected')">Reject</button>
+                                </div>
+                            </div>
+                            
+                        {% endfor %}
+                    {% else %}
+                        <p>No applications yet.</p>  
+                    {% endif %}
+                    <hr>
+                </div>
+                {% endfor %}
+            </div>
+            
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function handleLogout() {
+            window.location.href = "{% url 'logout' %}";
+        }
+
+       function updateApplicationStatus(applicationId, status) {
+    console.log(`Button clicked: Application ID = ${applicationId}, Status = ${status}`);
+
+    // Get CSRF token from hidden input field
+    const csrfToken = document.getElementById('csrf_token')?.value;
+
+    if (!csrfToken) {
+        console.error('CSRF token not found! Ensure it is present in your template.');
+        alert('Error: CSRF token missing. Refresh the page and try again.');
+        return;
+    }
+
+    fetch(`/update-application-status/${applicationId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({ status: status })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log(`Status updated: ${status}`);
+            alert(`Application status updated to ${status}`);
+            location.reload();
+        } else {
+            console.error(`Error: ${data.message}`);
+            alert(`Error: ${data.message}`);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while updating the application status.');
+    });
+}
+
+  
+    </script>
+
+</body>
+
+</html>

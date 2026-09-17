@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ jobseeker.full_name }}'s Profile</h2>
+    <p><strong>Full Name:</strong> <span id="fullName">{{ user_profile.full_name }}</span></p>
+    <p><strong>Email:</strong> <span id="email">{{ user_profile.user.email }}</span></p>
+    <p><strong>Phone:</strong> <span id="phone">{{ jobseeker.phone }}</span></p>
+    <p><strong>Location:</strong> <span id="location">{{ jobseeker.location }}</span></p>
+    <p><strong>Interpersonal Skilla:</strong> <span id="skills">{{ jobseeker.interpersonal_skills }}</span></p>
+    <p><strong>Technical Skills:</strong> <span id="technicalSkils">{{ jobseeker.technical_skills}}</span></p>
+    <p><strong>Experience:</strong> <span id="experience">{{ jobseeker.experience  }}</span></p>
+    <p><strong>Education:</strong> <span id="education">{{ jobseeker.education }}</span></p>
+
+
+    <a href="{% url 'employer_dashboard' %}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+
+</div>
+{% endblock %}

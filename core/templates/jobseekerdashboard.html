@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - JobEntry</title>
+    
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Inter:wght@700;800&display=swap" rel="stylesheet">
+
+    <!-- Icon Fonts & Bootstrap -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet"> -->
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            background-color: #343a40;
+            color: white;
+            padding: 20px;
+            flex-shrink: 2px;
+            top: 0;
+            left: 0;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 15px;
+            font-size: 16px;
+            padding: 10px;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #495057;
+            padding-left: 15px;
+        }
+
+        .content-area {
+            width: 100%;
+            padding: 30px;
+            background-color: #ffffff;
+        }
+
+        /* Welcome Banner */
+        .welcome-banner {
+            background-color: #343a40;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .welcome-banner h2 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .welcome-banner p {
+            font-size: 16px;
+        }
+
+        /* Search Section */
+        .search-filters {
+            background-color: #ffffff;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 40px; /* Added more spacing between search and job listings */
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-filters input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .search-filters button {
+            background-color: #2683ee;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .search-filters button:hover {
+            background-color: #1a5bbf;
+        }
+        
+        /* Job Feed */
+        .job-feed {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .job-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 jobs per row */
+            gap: 20px;
+        }
+
+        .job-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 6px;
+            transition: 0.3s;
+            background-color: #f9f9f9;
+            position: relative; /* Ensures child elements are properly positioned */
+            overflow: hidden; /* Prevents overflow when expanding */
+        }
+
+        .job-card h5 {
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .job-card p {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .job-card .job-details {
+            display: none; /* Initially hide the job details */
+            max-height: 0; /* Prevent expansion beyond the initial size */
+            overflow: hidden;
+            transition: max-height 0.3s ease-out; /* Smooth transition for expanding */
+        }
+
+        /* View More Button */
+        .job-card .btn-info {
+            margin-top: 10px;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .job-card:hover {
+            background-color: #eef1f7;
+            transform: translateY(-3px);
+        }
+       
+        .toggle-details {
+    margin-top: 10px;
+    cursor: pointer;
+    background-color: #4cb5e5;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+}
+.top-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+            align-items: center;
+            background-color: #f4f4f4;
+            padding: 10px 20px;
+            border-bottom: 1px solid #ddd;
+            position: fixed;
+            width: calc(100% - 250px);
+            top: 0;
+            left: 250px;
+        }
+        
+        .top-bar button {
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .top-bar button:hover {
+            background-color: #575757;
+        }
+        /* Apply Now Button */
+.btn-success {
+    background-color: #28a745; /* Green color */
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none; /* Remove underline */
+    transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.btn-success:hover {
+    background-color: #218838; /* Darker green on hover */
+    transform: translateY(-2px);
+    text-decoration: none; /* Ensure underline doesn't appear */
+}
+
+.btn-success:active {
+    background-color: #1e7e34; /* Even darker green when clicked */
+    transform: scale(0.98);
+}
+
+
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .job-grid {
+                grid-template-columns: repeat(2, 1fr); /* 2 jobs per row for tablets */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                text-align: center;
+                padding: 15px;
+            }
+
+            .content-area {
+                padding: 20px;
+            }
+
+            .job-grid {
+                grid-template-columns: repeat(1, 1fr); /* 1 job per row for mobile */
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h2 class="text-center mb-4">Job Seeker</h2>
+            <a href="{% url 'jobseeker_dashboard' %}" class="active">Dashboard</a>
+            <a href="{% url 'notifications' %}">Notifications</a>
+            <a href="{% url 'jobseeker_recommendations' %}">Recommendation</a>
+            <a href="{% url 'jobseeker_profile' %}">Profile</a>
+
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Logout Button -->
+            <div class="top-bar">
+                <button onclick="handleLogout()">Log Out</button>
+            </div>
+
+            <!-- Welcome Banner -->
+            <div class="welcome-banner">
+                <h2>Welcome, {{ request.user.username }}</h2>
+                <p>Your personalized job feed is here!</p>
+            </div>
+
+            <!-- Search and Filters Section -->
+            <!-- <div class="search-filters">
+                <input type="text" placeholder="Search for jobs...">
+                <button>Search</button>
+            </div> -->
+            <div class="search-filters">
+                <input type="text" id="jobSearchInput" placeholder="Search for jobs..." onkeyup="searchJobs()">
+                <button onclick="searchJobs()">Search</button>
+            </div>
+
+            <!-- Job Feed -->
+            <div class="job-feed">
+                <h4>Latest Job Openings</h4>
+                <p><strong>Total Jobs Found: {{ job_postings.count }}</strong></p>
+                <div class="job-grid">
+                    {% for job in job_postings %}
+                        <div class="job-card">
+                            <h5>{{ job.JobTitle }}</h5>
+                            <div class="job-details" style="display: none;">
+                                <p><strong>Company:</strong> {% if job.company %} {{ job.company.Name }} {% else %} Not Available {% endif %}</p>
+                                <p><strong>Location:</strong> {{ job.JobLocation }}</p>
+                                <p><strong>Description:</strong> {{ job.JobDescription }}</p>
+                                <p><strong>Deadline:</strong> {{ job.ApplicationDeadline }}</p>
+                            </div>
+                            <button class="btn btn-info btn-sm toggle-details">View </button>
+                            <!-- Inside the job-card div in your HTML -->
+                            <button class="btn btn-success apply-btn" data-job-id="{{ job.id }}">Apply Now</button>
+                            <p class="application-status" id="status-{{ job.id }}" style="display:none;"></p>
+
+                        </div>
+                    {% empty %}
+                        <p>No job postings available.</p>
+                    {% endfor %}
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    <form method="post">
+        {% csrf_token %}
+    </form>
+    
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function handleLogout() {
+            window.location.href = "{% url 'logout' %}";
+        }
+        
+        function searchJobs() {
+        let query = document.getElementById("jobSearchInput").value;  // Get search input
+        fetch(`/search/?q=${query}`)  // Send query to backend
+            .then(response => response.json())  // Convert response to JSON
+            .then(data => {
+                let jobGrid = document.querySelector(".job-grid");  // Get job grid container
+                jobGrid.innerHTML = "";  // Clear previous results
+
+                if (data.jobs.length === 0) {
+                    jobGrid.innerHTML = "<p>No jobs found.</p>";  // Show message if no jobs match
+                } else {
+                    data.jobs.forEach(job => {
+                        jobGrid.innerHTML += `
+                            <div class="job-card">
+                                <h5>${job.title}</h5>
+                                <p><strong>Company:</strong> ${job.company}</p>
+                                <p><strong>Location:</strong> ${job.location}</p>
+                                <p><strong>Description:</strong> ${job.description.substring(0, 100)}...</p>
+                                <p><strong>Deadline:</strong> ${job.deadline}</p>
+                                <a href="/apply/${job.id}" class="btn btn-success btn-sm">Apply Now</a>
+                            </div>
+                        `;
+                    });
+                }
+            })
+            .catch(error => console.error("Error fetching jobs:", error));
+    }
+    
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".toggle-details").forEach(button => {
+            button.addEventListener("click", function () {
+                let detailsDiv = this.previousElementSibling;
+                let allJobDetails = document.querySelectorAll(".job-details"); // Get all job details elements
+
+            // First, hide all job details
+            allJobDetails.forEach(detail => {
+                if (detail !== detailsDiv) {
+                    detail.style.maxHeight = "0"; // Hide other job details
+                    detail.style.display = "none"; // Hide other job details
+                }
+            });
+            
+            // Now, toggle the clicked job's details
+            if (detailsDiv.style.display === "none" || detailsDiv.style.maxHeight === "0px") {
+                detailsDiv.style.display = "block";
+                detailsDiv.style.maxHeight = detailsDiv.scrollHeight + "px"; // Expand to fit content
+                this.textContent = "View Less";
+            } else {
+                detailsDiv.style.maxHeight = "0"; // Collapse the details
+                this.textContent = "View More";
+            }
+            });
+        });
+    });
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('search-bar').addEventListener('input', function() {
+        let query = this.value;
+
+        if (query.length > 0) {
+            // Perform AJAX request
+            fetch(`/job_search_suggestions/?query=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    let suggestionsList = document.getElementById('suggestions-list');
+                    suggestionsList.innerHTML = '';  // Clear previous suggestions
+
+                    // Show suggestions
+                    data.forEach(function(suggestion) {
+                        let listItem = document.createElement('li');
+                        listItem.textContent = suggestion;
+                        suggestionsList.appendChild(listItem);
+                    });
+                })
+                .catch(error => console.error('Error fetching suggestions:', error));
+        } else {
+            // Clear suggestions when query is empty
+            document.getElementById('suggestions-list').innerHTML = '';
+        }
+    }); 
+  }); 
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".apply-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            const jobId = this.getAttribute("data-job-id");
+            applyForJob(jobId);
+        });
+    });
+});
+
+function applyForJob(jobId) {
+    console.log("Applying for Job ID:", jobId);
+
+    fetch(`/apply/${jobId}/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken")  // CSRF token function added
+        },
+        body: JSON.stringify({ job_id: jobId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Server response:", data);
+        if (data.success) {
+            document.getElementById(`status-${jobId}`).textContent = "Application Submitted!";
+            document.getElementById(`status-${jobId}`).style.display = "block";
+            alert(data.message);
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => console.error("Error applying for job:", error));
+}
+
+// Function to get CSRF token from cookies
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.startsWith(name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+          </script>
+
+</body>
+</html>

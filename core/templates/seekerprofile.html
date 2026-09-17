@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Seeker Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #343a40;
+            color: white;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            padding: 15px 20px;
+            text-decoration: none;
+            color: white;
+            display: block;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #495057;
+        }
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .profile-container {
+            margin-top: 10px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #343a40;
+        }
+
+        .profile-info p {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .edit-btn, .save-btn {
+            display: block;
+            width: 100px;
+            margin: 20px auto;
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .edit-btn:hover {
+            background-color: #218838;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .profile-picture-container {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 3px solid #343a40;
+        margin: 0 auto;
+    }
+
+    .profile-picture {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .save-btn {
+    width: 140px;
+    height: 45px;
+    font-size: 16px;
+    background-color: #28a745; /* Green color for a fresh look */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.save-btn:hover {
+    background-color: #218838; /* Slightly darker green on hover */
+    transform: scale(1.05);
+}
+
+.edit-btn {
+    width: 140px;
+    height: 45px;
+    font-size: 16px;
+    background-color: #28a745; /* Blue for contrast */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.edit-btn:hover {
+    background-color: #218838; /* Darker blue on hover */
+    transform: scale(1.05);
+}
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <h3 class="text-center text-white">Job Seeker</h3>
+        <a href="{% url 'jobseeker_dashboard' %}" class="active">Dashboard</a>
+        <a href="{% url 'notifications' %}">Notifications</a>
+        <a href="{% url 'jobseeker_recommendations' %}">Recommendation</a>
+        <a href="{% url 'jobseeker_profile' %}">Profile</a>
+        
+        
+    </div>
+
+
+    <div class="content">
+        <div class="profile-container">
+            <h2 class="profile-title">Job Seeker Profile</h2>
+
+            <!-- Displaying Profile Information -->
+            <div class="profile-info">
+                <div class="text-center">
+                    <div class="profile-picture-container">
+                        <img id="profilePic" src="{{ jobseeker.profile_picture.url }}" class="profile-picture" alt="Profile Picture">
+                    </div>
+                    <input type="file" id="profilePicInput" class="form-control mt-2" accept="image/*"  style="display: none;">
+                    <button type="button" class="save-btn mt-2" onclick="document.getElementById('profilePicInput').click()">Upload</button>
+                </div>
+                <p><strong>Full Name:</strong> <span id="fullName">{{ user_profile.full_name }}</span></p>
+                <p><strong>Email:</strong> <span id="email">{{ user_profile.user.email }}</span></p>
+                <p><strong>Phone:</strong> <span id="phone">{{ jobseeker.phone }}</span></p>
+                <p><strong>Location:</strong> <span id="location">{{ jobseeker.location }}</span></p>
+                <p><strong>Interpersonal Skills:</strong> <span id="skills">{{ jobseeker.interpersonal_skills }}</span></p>
+                <p><strong>Technical Skills:</strong> <span id="technicalSkills">{{ jobseeker.technical_skills }}</span></p>
+                <p><strong>Experience:</strong> <span id="experience">{{ jobseeker.experience }}</span></p>
+                <p><strong>Education:</strong> <span id="education">{{ jobseeker.education }}</span></p>
+
+
+            </div>
+
+            <!-- Editable Form (Hidden by Default) -->
+            <form id="editForm" class="hidden">
+                <div class="text-center">
+                    <div class="profile-picture-container">
+                        <img id="profilePic" src="{{ jobseeker.profile_picture.url }}" class="profile-picture" alt="Profile Picture">
+                    </div>
+                    <input type="file" id="profilePicInput" class="form-control mt-2" accept="image/*"  style="display: none;">
+                    <button type="button" class="save-btn mt-2" onclick="document.getElementById('profilePicInput').click()">Change Picture</button>
+                </div>
+
+                <label>Full Name:</label>
+                <input type="text" id="editFullName" class="form-control" value="{{ user_profile.full_name }}">
+                
+                <label>Email:</label>
+                <input type="email" id="editEmail" class="form-control" value="{{ user_profile.user.email }}">
+                
+                <label>Phone:</label>
+                <input type="text" id="editPhone" class="form-control" value="{{ jobseeker.phone }}">
+                
+                <label>Location:</label>
+                <input type="text" id="editLocation" class="form-control" value="{{ jobseeker.location }}">
+
+                <label>Interpersonal Skills:</label>
+                <textarea id="editSkills" class="form-control">{{ jobseeker.interpersonal_skills }}</textarea>
+
+                <label>Technical Skills:</label>
+                <textarea id="editTechnicalSkills" class="form-control">{{ jobseeker.technical_skills }}</textarea>
+
+                <label>Experience:</label>
+                <input type="text" id="editExperience" class="form-control" value="{{ jobseeker.experience }}">
+
+                <label>Education:</label>
+                <input type="text" id="editEducation" class="form-control" value="{{ jobseeker.education }}">
+
+                
+                <button type="button" class="save-btn mt-2" onclick="saveProfile()">Save</button>
+            </form>
+            <button class="edit-btn" onclick="editProfile()">Edit</button>
+        </div>
+
+    </div>
+
+    <script>
+        function editProfile() {
+            document.querySelector('.profile-info').classList.add('hidden'); // Hide profile display
+            document.getElementById('editForm').classList.remove('hidden'); // Show form
+            document.querySelector('.edit-btn').classList.add('hidden'); // Hide edit button while editing
+            document.getElementById('profilePicInput').removeAttribute('hidden');
+        }
+
+        function saveProfile() {
+        let newFullName = document.getElementById("editFullName").value;
+        let newEmail = document.getElementById("editEmail").value;
+        let newPhone = document.getElementById("editPhone").value;
+        let newLocation = document.getElementById("editLocation").value;
+        let newSkills = document.getElementById("editSkills").value;
+        let newTechnicalSkills = document.getElementById("editTechnicalSkills").value;
+        let newExperience = document.getElementById("editExperience").value;
+        let newEducation = document.getElementById("editEducation").value;
+
+        // Update the displayed profile information
+        document.getElementById("fullName").textContent = newFullName;
+        document.getElementById("email").textContent = newEmail;
+        document.getElementById("phone").textContent = newPhone;
+        document.getElementById("location").textContent = newLocation;
+        document.getElementById("skills").textContent = newSkills;
+        document.getElementById("technicalSkils").textContent = newTechnicalSkills;
+        document.getElementById("experience").textContent = newExperience;
+        document.getElementById("education").textContent = newEducation;
+
+        document.querySelector('.profile-info').classList.remove('hidden'); // Show profile
+        document.getElementById('editForm').classList.add('hidden'); // Hide form
+        document.querySelector('.edit-btn').classList.remove('hidden'); // Show edit button after saving
+        document.getElementById('profilePicInput').removeAttribute('hidden');
+
+        // Send AJAX request to update profile in Django
+        $.ajax({
+    type: "POST",
+    url: "{% url 'update_jobseeker_profile' %}",
+    data: {
+        full_name: newFullName,
+        email: newEmail,
+        phone: newPhone,
+        location: newLocation,
+        interpersonal_skills: newSkills,
+        technical_skills: newTechnicalSkills,
+        experience: newExperience,
+        education: newEducation,
+        csrfmiddlewaretoken: "{{ csrf_token }}"
+    },
+    success: function(response) {
+        console.log("Profile Updated Successfully:", response);
+        alert("Profile updated successfully!");
+    },
+    error: function(xhr) {
+        console.error("Error Updating Profile:", xhr.responseText);
+        alert("Error updating profile.");
+    }
+});
+
+    }
+    function uploadProfilePicture() {
+    let fileInput = document.getElementById('profilePicInput');
+    if (fileInput.files.length === 0) {
+        alert("Please select a file.");
+        return;
+    }
+
+    let formData = new FormData();
+    formData.append("profile_picture", fileInput.files[0]);
+    formData.append("csrfmiddlewaretoken", "{{ csrf_token }}");
+
+    $.ajax({
+        type: "POST",
+        url: "{% url 'upload_profile_picture' %}",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            // Update the profile picture in the UI
+            let profilePic = document.getElementById('profilePic');
+            profilePic.src = response.profile_picture_url + "?t=" + new Date().getTime(); // Force refresh
+
+            alert("Profile picture updated successfully!");
+        },
+        error: function(xhr) {
+            alert("Error uploading profile picture.");
+        }
+    });
+}
+
+    document.querySelector(".save-btn").addEventListener("click", function() {
+        document.getElementById("profilePicInput").click();
+    });
+
+    document.getElementById("profilePicInput").addEventListener("change", function() {
+        uploadProfilePicture(); // Call the upload function when the file is selected
+    });
+
+    </script>
+</body>
+
+</html>

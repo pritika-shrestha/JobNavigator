@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Recommendations</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Inter:wght@700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="lib/animate/animate.min.css" rel="stylesheet">
+    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="css/style.css" rel="stylesheet">
+
+    <style>
+        .sidebar {
+            width: 300px;
+            height: 100vh;
+            background-color: #343a40;
+            color: white;
+            padding: 20px;
+            flex-shrink: 0;
+        }
+
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .sidebar a:hover {
+            background-color: #21262d;
+            padding-left: 10px;
+            transition: all 0.3s;
+        }
+
+        /* Media Queries for responsiveness */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: fixed;
+                height: 100%;
+                z-index: 9999;
+                top: 0;
+                left: -250px;
+                transition: left 0.3s ease;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .sidebar-toggle-btn {
+                display: block;
+                font-size: 30px;
+                color: #2683ee;
+                margin-left: 15px;
+                cursor: pointer;
+            }
+        }
+
+        .main-container {
+            display: flex;
+        }
+
+        .job-listing-container {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .sidebar h2 {
+            color: white;
+        }
+
+        /* Styling for job cards */
+        .job-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .job-card h4 {
+            font-size: 1.25rem;
+            color: #333;
+        }
+
+        .job-card p {
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .save-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .save-btn.saved {
+            background-color: #6c757d;
+        }
+        /* .job-card {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        } */
+        .job-title {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .job-company {
+            color: #555;
+        }
+        .job-location {
+            color: #777;
+        }
+        .job-relevance {
+            color: #28a745;
+            font-weight: bold;
+        }
+                /* Apply Now Button */
+.btn-success {
+    background-color: #28a745; /* Green color */
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none; /* Remove underline */
+    transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.btn-success:hover {
+    background-color: #218838; /* Darker green on hover */
+    transform: translateY(-2px);
+    text-decoration: none; /* Ensure underline doesn't appear */
+}
+
+.btn-success:active {
+    background-color: #1e7e34; /* Even darker green when clicked */
+    transform: scale(0.98);
+}
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar code -->
+    <div class="main-container">
+        <div class="sidebar">
+            <h2 class="text-center mb-4">Job Seeker</h2>
+            <a href="{% url 'jobseeker_dashboard' %}" class="active">Dashboard</a>
+            <a href="{% url 'notifications' %}">Notifications</a>
+            <a href="{% url 'jobseeker_recommendations' %}">Recommendations</a>
+            <a href="{% url 'jobseeker_profile' %}">Profile</a>
+        </div>
+        {% csrf_token %}
+        <div class="job-listing-container">
+            <h1>Recommended Jobs</h1>
+            {% if recommended_jobs %}
+                <ul>
+                    {% for rec in recommended_jobs %}
+                        <li>
+                            <h2>{{ rec.job.JobTitle }}</h2>
+                            <p>Company: {{ rec.job.company.Name }}</p>
+                            <p>Location: {{ rec.job.JobLocation }}</p>
+                            <!-- <p>Score: {{ rec.score|floatformat:2 }}</p> -->
+                            <!-- <p>Score: {{ rec.relevance|floatformat:2 }}</p>x   -->
+                            <p>{{ rec.job.JobDescription }}</p>
+                        </li>
+                        <button class="btn btn-success apply-btn" data-job-id="{{ rec.job.id }}">Apply Now</button>
+                        <p class="application-status" id="status-{{ rec.job.id }}" style="display:none;"></p>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No recommendations found. Update your profile to get better matches.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // Initialize saved jobs
+        let savedJobs = JSON.parse(localStorage.getItem('savedJobs')) || [];
+
+        // Function to save a job
+        function saveJob(jobTitle) {
+            if (!savedJobs.includes(jobTitle)) {
+                savedJobs.push(jobTitle);
+                localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
+
+                // Update the button text and style
+                let button = event.target;
+                button.textContent = 'Saved';
+                button.classList.add('saved');
+                alert(`Job "${jobTitle}" saved!`);
+            }
+        }
+        function saveJob(jobTitle) {
+    const button = event.target;
+    if (!savedJobs.includes(jobTitle)) {
+        savedJobs.push(jobTitle);
+        button.textContent = 'Saved';
+        button.classList.add('saved');
+        alert(`Job "${jobTitle}" saved!`);
+    } else {
+        savedJobs = savedJobs.filter(job => job !== jobTitle);
+        button.textContent = 'Save Job';
+        button.classList.remove('saved');
+        alert(`Job "${jobTitle}" removed from saved jobs.`);
+    }
+    localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".apply-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            const jobId = this.getAttribute("data-job-id");
+            console.log("Job ID:", jobId);  // Debugging line
+            if (!jobId) {
+                alert("Invalid job ID.");
+                return;
+            }
+            applyForJob(jobId);
+        });
+    });
+});
+
+function applyForJob(jobId) {
+    console.log("Applying for Job ID:", jobId);  // Debugging line
+    if (!jobId) {
+        alert("Invalid job ID.");
+        return;
+    }
+
+    fetch(`/apply/${jobId}/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken")
+        },
+        body: JSON.stringify({ job_id: jobId })
+    })
+    .then(response => {
+        if (!response.ok) {
+            // Handle non-JSON responses (e.g., HTML error pages)
+            return response.text().then(text => {
+                throw new Error(`Server returned: ${text}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Server response:", data);
+        if (data.success) {
+            document.getElementById(`status-${jobId}`).textContent = "Application Submitted!";
+            document.getElementById(`status-${jobId}`).style.display = "block";
+            alert(data.message);
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error("Error applying for job:", error);
+        alert("Failed to apply for the job. Please try again.");
+    });
+}
+// Function to get CSRF token from cookies
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.startsWith(name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+    </script>
+</body>
+
+</html>
